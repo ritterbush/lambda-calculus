@@ -1,8 +1,11 @@
 # lambda-calculus
 
-Implements basic functions, primitive recursive functions,
+Implements basic combinator functions, primitive recursive functions,
 and from there, the possibility of all computable functions in
 the untyped lambda calculus in Python.
+
+Contains documentation documentation about working around Python's 
+eager evaluation in implementing recursion.
 
 Convert lambda (Church) numerals to Python numbers and vice versa with:
 eval_numeral(church_numeral)
