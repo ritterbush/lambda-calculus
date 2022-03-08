@@ -8,6 +8,7 @@ Contains documentation about working around Python's
 eager evaluation in implementing recursion.
 
 Convert lambda (Church) numerals to Python numbers and vice versa with:
+
 eval_numeral(church_numeral)
 make_numeral(n)
 
