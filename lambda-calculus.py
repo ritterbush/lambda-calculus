@@ -105,7 +105,7 @@ VIM = V(I)(M)
 assert VIM(K) == I
 assert VIM(KI) == M
 
-# Used on pairs which hold arguments, such as VIM
+# Used on Church pairs
 FIRST = lambda a: a(K)
 SECOND = lambda a: a(KI)
 
@@ -259,7 +259,7 @@ ZEQUIV = lambda a: M(lambda b: a(lambda c: M(b)(c)))
 # Note Python's lazy-evaluation for if/else statements
 R = (lambda a: lambda b: 1 if b == 0 else b*a(b-1))
 # Still needs Z to avoid infinite recursion loop
-#FAC = Z(R) # This works with number arguments
+#FAC = Z(R) # This works with Python number arguments
 
 # To use Z with only lambdas, make a naive recursive version
 # of factorial (like FACV3 above) where f is thought of as
@@ -322,6 +322,21 @@ NEWFIB =  lambda n: n(lambda f: lambda a: lambda b: f(b)(ADD(a)(b)))(K)(N0)(N1)
 GCD =  (lambda g: lambda m: lambda n: LEQ(m)(n)((g)(n)(m))((g)(n)(m)))\
         (Z(lambda g: lambda x: lambda y: LAZYISN0(y)(lambda: x)(lambda: (g)(y)(MOD(x)(y)))))
 
+
+LAZYAND = lambda a: lambda b: a(lambda: b)(lambda: a)
+LAZYEQ = lambda a: lambda b: LAZYAND(LAZYISN0(SUB(a)(b)))(LAZYISN0(SUB(b)(a)))
+# Just for fun: if Collatz is false, there is some church numeral > 0
+# for which this theoretically never halts: although Python would reach recursion
+# or memory limits
+COLLATZPROTO = (lambda g: lambda a:\
+            LAZYEQ(a)(N1)\
+            (lambda: "Collatz True-with-a-capital-T for that input!")\
+            (lambda:\
+            LAZYEQ(MOD(a)(N2))(N0)\
+            (lambda: g(DIV(a)(N2)))\
+            (lambda: g(ADD(MUL(a)(N3))(N1)))))
+COLLATZ = Z(COLLATZPROTO)
+
 # Computability and Logic (C&L) 3rd ed. p 76
 # Primitive Recursion:
 # h(x, 0) = f(x), h(x, suc(y)) = g(x, y, h(x, y))
@@ -341,7 +356,6 @@ PRX1PROTO = lambda h: lambda f: lambda g: lambda y:\
         (lambda: g(PRED(y))(h(f)(g)(PRED(y))))
 PRX1 = Z(PRX1PROTO)
 
-
 # C&L 3rd ed. p 77--Extending PR to single or(XOR) more than two variables
 # Primitive Recursion for defining triple var fns:
 # h(x1, x2, 0) = f(x1, x2), h(x1, x2, suc(y)) = g(x1, x2, y, h(x1, x2, y))
@@ -351,7 +365,7 @@ PRX3PROTO = lambda h: lambda f: lambda g: lambda x1: lambda x2: lambda y:\
         (lambda: g(x1)(x2)(PRED(y))(h(f)(g)(x1)(x2)(PRED(y))))
 PRX3 = Z(PRX3PROTO)
 
-# Quad and greater than 4-tuple PR functions could be defined from here ....
+# Quadary and greater PR functions could be defined from here ....
 
 
 # More ID fns, named according to C&L 3rd ed.
@@ -376,8 +390,10 @@ CNG2X3 = lambda f: lambda g: lambda h: lambda x: lambda y: lambda z: f(g(x)(y)(z
 CN2G = lambda f: lambda g: lambda h: lambda x: f(g(x))(h(x))
 # Two g args, two x args:
 CNG2X2 = lambda f: lambda g: lambda h: lambda x: lambda y: f(g(x)(y))(h(x)(y))
-# Zero Primitive Recursive fn
+
+# The zero primitive recursive fn
 ZERO = lambda a: a(K(N0))(N0)
+ZERO = lambda a: N0
 
 # x + 2
 ADD2 = B(SUC)(SUC)
