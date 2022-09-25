@@ -1,20 +1,31 @@
 """
-Implements basic combinator functions, primitive recursive functions, 
-and from there, the possibility of all computable functions in the 
+Implements basic combinator functions, primitive recursive functions,
+and from there, the possibility of all computable functions in the
 untyped lambda calculus in Python.
 
 Contains documentation documentation about working around Python's
 eager evaluation in implementing recursion.
 
-Convert lambda (Church) numerals to Python numbers and vice versa
-with: eval_numeral(church_numeral) make_numeral(n)
+Convert Church Numerals to Python integers and vice versa with:
 
-Similarly evaluate booleans with eval_boolean(church_boolean).
+    decode_num(church_numeral)
+    make_num(n)
 
 Church numerals N0-N32 are defined for convenience.
 
+Similarly convert Church Booleans to Python booleans with:
+
+    decode_bool(church_boolean)
+
 Evaluate Church operator functions by passing them as an argument
-in their proper eval argument: e.g. eval_numeral(MUL(N3)(N5))
+in their proper decode function (apply functions to their arguments with parentheses); e.g.
+
+    decode_num (MUL(SUC(N2))(ADD(N2)(N2)))        # == 12
+    decode_bool (AND(NOT(NOT(NOT(FALSE))))(TRUE)) # == True
+
+To use, enter the following into a terminal:
+
+    python3 -i lambda-calculus.py
 """
 
 # ID fn
@@ -105,7 +116,7 @@ VIM = V(I)(M)
 assert VIM(K) == I
 assert VIM(KI) == M
 
-# Used on Church pairs
+# Used on pairs which hold arguments, such as VIM
 FIRST = lambda a: a(K)
 SECOND = lambda a: a(KI)
 
@@ -147,7 +158,7 @@ N12 = MUL(N3)(N4)
 N13 = SUC(MUL(N3)(N4))
 N14 = SUC(N13)
 N15 = SUC(N14)
-N16 = SUC(N15)
+N16 = T(N2)(N4)
 N17 = SUC(N16)
 N18 = SUC(N17)
 N19 = SUC(N18)
@@ -158,12 +169,13 @@ N23 = SUC(N22)
 N24 = SUC(N23)
 N25 = SUC(N24)
 N26 = SUC(N25)
-N27 = SUC(N26)
+N27 = T(N3)(N3)
 N28 = SUC(N27)
 N29 = SUC(N28)
 N30 = SUC(N29)
 N31 = SUC(N30)
-N32 = SUC(N31)
+N32 = T(N2)(N5)
+N64 = T(N2)(N6)
 
 # Triple data structure
 V3 = lambda a: lambda b: lambda c: lambda d: d(a)(b)(c)
@@ -242,7 +254,7 @@ FACV4 = (lambda f: lambda a: LAZYISN0(a)\
 # ID(Anything) = Anything
 # Some fns don't have any fixpoints
 
-# The Y Fixed-Point Combinator works in lazy languages
+# The Y Fixed-Point Combinator works in lazy languages--e.g., Haskell
 Y = (lambda a:
     (lambda b: a(b(b)) )
     (lambda b: a(b(b)) ))
@@ -259,7 +271,7 @@ ZEQUIV = lambda a: M(lambda b: a(lambda c: M(b)(c)))
 # Note Python's lazy-evaluation for if/else statements
 R = (lambda a: lambda b: 1 if b == 0 else b*a(b-1))
 # Still needs Z to avoid infinite recursion loop
-#FAC = Z(R) # This works with Python number arguments
+#FAC = Z(R) # This works with number arguments
 
 # To use Z with only lambdas, make a naive recursive version
 # of factorial (like FACV3 above) where f is thought of as
@@ -322,21 +334,6 @@ NEWFIB =  lambda n: n(lambda f: lambda a: lambda b: f(b)(ADD(a)(b)))(K)(N0)(N1)
 GCD =  (lambda g: lambda m: lambda n: LEQ(m)(n)((g)(n)(m))((g)(n)(m)))\
         (Z(lambda g: lambda x: lambda y: LAZYISN0(y)(lambda: x)(lambda: (g)(y)(MOD(x)(y)))))
 
-
-LAZYAND = lambda a: lambda b: a(lambda: b)(lambda: a)
-LAZYEQ = lambda a: lambda b: LAZYAND(LAZYISN0(SUB(a)(b)))(LAZYISN0(SUB(b)(a)))
-# Just for fun: if Collatz is false, there is some church numeral > 0
-# for which this theoretically never halts: although Python would reach recursion
-# or memory limits
-COLLATZPROTO = (lambda g: lambda a:\
-            LAZYEQ(a)(N1)\
-            (lambda: "Collatz True-with-a-capital-T for that input!")\
-            (lambda:\
-            LAZYEQ(MOD(a)(N2))(N0)\
-            (lambda: g(DIV(a)(N2)))\
-            (lambda: g(ADD(MUL(a)(N3))(N1)))))
-COLLATZ = Z(COLLATZPROTO)
-
 # Computability and Logic (C&L) 3rd ed. p 76
 # Primitive Recursion:
 # h(x, 0) = f(x), h(x, suc(y)) = g(x, y, h(x, y))
@@ -356,6 +353,7 @@ PRX1PROTO = lambda h: lambda f: lambda g: lambda y:\
         (lambda: g(PRED(y))(h(f)(g)(PRED(y))))
 PRX1 = Z(PRX1PROTO)
 
+
 # C&L 3rd ed. p 77--Extending PR to single or(XOR) more than two variables
 # Primitive Recursion for defining triple var fns:
 # h(x1, x2, 0) = f(x1, x2), h(x1, x2, suc(y)) = g(x1, x2, y, h(x1, x2, y))
@@ -365,7 +363,7 @@ PRX3PROTO = lambda h: lambda f: lambda g: lambda x1: lambda x2: lambda y:\
         (lambda: g(x1)(x2)(PRED(y))(h(f)(g)(x1)(x2)(PRED(y))))
 PRX3 = Z(PRX3PROTO)
 
-# Quadary and greater PR functions could be defined from here ....
+# Quad and greater than 4-tuple PR functions could be defined from here ....
 
 
 # More ID fns, named according to C&L 3rd ed.
@@ -390,10 +388,8 @@ CNG2X3 = lambda f: lambda g: lambda h: lambda x: lambda y: lambda z: f(g(x)(y)(z
 CN2G = lambda f: lambda g: lambda h: lambda x: f(g(x))(h(x))
 # Two g args, two x args:
 CNG2X2 = lambda f: lambda g: lambda h: lambda x: lambda y: f(g(x)(y))(h(x)(y))
-
-# The zero primitive recursive fn
+# Zero Primitive Recursive fn
 ZERO = lambda a: a(K(N0))(N0)
-ZERO = lambda a: N0
 
 # x + 2
 ADD2 = B(SUC)(SUC)
@@ -416,7 +412,7 @@ SIGNUM = PRX1(N0)(CNX2(SUC)(CNX2(ZERO)(ID21)))
 NOTSIGNUM = PRX1(N1)(CNX2(ZERO)(ID21))
 
 
-def eval_boolean(church_boolean):
+def decode_bool(church_boolean):
     """
     Evaluates Church Boolean to a Python boolean.
     Works only if TRUE and FALSE are assigned to their
@@ -431,7 +427,7 @@ def eval_boolean(church_boolean):
     print("Boolean evaluation failed! Maybe input was not a Church Boolean?")
     return None
 
-def eval_numeral(church_numeral):
+def decode_num(church_numeral):
     """
     Evaluates church numerals to a Python number.
     """
@@ -441,7 +437,7 @@ def eval_numeral(church_numeral):
 
     return church_numeral(suc)(n0)
 
-def make_numeral(n):
+def make_num(n):
     """
     Makes church numeral from a natural number.
     """
@@ -455,9 +451,9 @@ def make_numeral(n):
 
     return result
 
-def eval_pair(pair):
-    return [eval_numeral(FIRST(pair)), eval_numeral(SECOND(pair))]
+def decode_pair(pair):
+    return [decode_num(FIRST(pair)), decode_num(SECOND(pair))]
 
-def eval_triple(triple):
-    return [eval_numeral(V3FIRST(triple)),eval_numeral(V3SECOND(triple)),eval_numeral(V3THIRD(triple))]
+def decode_triple(triple):
+    return [decode_num(V3FIRST(triple)),decode_num(V3SECOND(triple)),decode_num(V3THIRD(triple))]
 

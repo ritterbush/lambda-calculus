@@ -4,23 +4,30 @@ Implements basic combinator functions, primitive recursive functions,
 and from there, the possibility of all computable functions in the
 untyped lambda calculus in Haskell.
 
+Uses a custom Haskell data type to work around type errors from many basic combinators.
+
 Convert Church Numerals to Haskell Integers and vice versa with:
+
     decodeNum(church_numeral)
     makeNum(n)
 
 Church numerals n0-n32 are defined for convenience.
 
 Similarly convert Church Booleans to Haskell Bools with:
+
     decodeBool(church_boolean)
 
 Evaluate Church operator functions by passing them as an argument
 in their proper decode function (apply functions to their arguments with '!'); e.g.
-decodeNum (mul ! (suc ! n2) ! (add ! n2 ! n2))      -- == 12
-decodeBool (and ! (not ! not ! not ! false) ! true) -- == True
+
+    decodeNum (mul ! (suc ! n2) ! (add ! n2 ! n2))      -- == 12
+    decodeBool (and ! (not ! not ! not ! false) ! true) -- == True
 
 To use, enter the following into a terminal:
+
     ghci
-    :l lambdaCalculus
+    :l LambdaCalculus
+
 
 -- Substitution commands:
 %s/^[A-Z]*/\L&/
