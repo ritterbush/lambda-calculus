@@ -1,20 +1,27 @@
 """
-Implements basic combinator functions, primitive recursive functions, 
-and from there, the possibility of all computable functions in the 
+Implements basic combinator functions, primitive recursive functions,
+and from there, the possibility of all computable functions in the
 untyped lambda calculus in Python.
 
 Contains documentation documentation about working around Python's
 eager evaluation in implementing recursion.
 
-Convert lambda (Church) numerals to Python numbers and vice versa
-with: eval_numeral(church_numeral) make_numeral(n)
-
-Similarly evaluate booleans with eval_boolean(church_boolean).
+Convert Church Numerals to Python integers and vice versa with:
+    decode_num(church_numeral)
+    make_num(n)
 
 Church numerals N0-N32 are defined for convenience.
 
+Similarly convert Church Booleans to Python booleans with:
+    decode_bool(church_boolean)
+
 Evaluate Church operator functions by passing them as an argument
-in their proper eval argument: e.g. eval_numeral(MUL(N3)(N5))
+in their proper decode function (apply functions to their arguments with parentheses); e.g.
+    decode_num (MUL(SUC(N2))(ADD(N2)(N2)))        # == 12
+    decode_bool (AND(NOT(NOT(NOT(FALSE))))(TRUE)) # == True
+
+To use, enter the following into a terminal:
+    python3 -i lambda_calculus.py
 """
 
 # ID fn
@@ -147,6 +154,24 @@ N12 = MUL(N3)(N4)
 N13 = SUC(MUL(N3)(N4))
 N14 = SUC(N13)
 N15 = SUC(N14)
+N16 = T(N2)(N4)
+N17 = SUC(N16)
+N18 = SUC(N17)
+N19 = SUC(N18)
+N20 = SUC(N19)
+N21 = SUC(N20)
+N22 = SUC(N21)
+N23 = SUC(N22)
+N24 = SUC(N23)
+N25 = SUC(N24)
+N26 = SUC(N25)
+N27 = T(N3)(N3)
+N28 = SUC(N27)
+N29 = SUC(N28)
+N30 = SUC(N29)
+N31 = SUC(N30)
+N32 = T(N2)(N5)
+N64 = T(N2)(N6)
 
 # Triple data structure
 V3 = lambda a: lambda b: lambda c: lambda d: d(a)(b)(c)
@@ -225,7 +250,7 @@ FACV4 = (lambda f: lambda a: LAZYISN0(a)\
 # ID(Anything) = Anything
 # Some fns don't have any fixpoints
 
-# The Y Fixed-Point Combinator works in lazy languages
+# The Y Fixed-Point Combinator works in lazy languages--e.g., Haskell
 Y = (lambda a:
     (lambda b: a(b(b)) )
     (lambda b: a(b(b)) ))
@@ -383,7 +408,7 @@ SIGNUM = PRX1(N0)(CNX2(SUC)(CNX2(ZERO)(ID21)))
 NOTSIGNUM = PRX1(N1)(CNX2(ZERO)(ID21))
 
 
-def eval_boolean(church_boolean):
+def decode_bool(church_boolean):
     """
     Evaluates Church Boolean to a Python boolean.
     Works only if TRUE and FALSE are assigned to their
@@ -398,7 +423,7 @@ def eval_boolean(church_boolean):
     print("Boolean evaluation failed! Maybe input was not a Church Boolean?")
     return None
 
-def eval_numeral(church_numeral):
+def decode_num(church_numeral):
     """
     Evaluates church numerals to a Python number.
     """
@@ -408,7 +433,7 @@ def eval_numeral(church_numeral):
 
     return church_numeral(suc)(n0)
 
-def make_numeral(n):
+def make_num(n):
     """
     Makes church numeral from a natural number.
     """
@@ -422,9 +447,9 @@ def make_numeral(n):
 
     return result
 
-def eval_pair(pair):
-    return [eval_numeral(FIRST(pair)), eval_numeral(SECOND(pair))]
+def decode_pair(pair):
+    return [decode_num(FIRST(pair)), decode_num(SECOND(pair))]
 
-def eval_triple(triple):
-    return [eval_numeral(V3FIRST(triple)),eval_numeral(V3SECOND(triple)),eval_numeral(V3THIRD(triple))]
+def decode_triple(triple):
+    return [decode_num(V3FIRST(triple)),decode_num(V3SECOND(triple)),decode_num(V3THIRD(triple))]
 
