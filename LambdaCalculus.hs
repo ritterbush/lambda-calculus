@@ -11,7 +11,7 @@ Convert Church Numerals to Haskell Integers and vice versa with:
     decodeNum(church_numeral)
     makeNum(n)
 
-Church numerals n0-n32 are defined for convenience.
+Church Numerals n0-n32 are defined for convenience.
 
 Similarly convert Church Booleans to Haskell Bools with:
 

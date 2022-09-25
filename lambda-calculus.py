@@ -3,7 +3,7 @@ Implements basic combinator functions, primitive recursive functions,
 and from there, the possibility of all computable functions in the
 untyped lambda calculus in Python.
 
-Contains documentation documentation about working around Python's
+Contains documentation about working around Python's
 eager evaluation in implementing recursion.
 
 Convert Church Numerals to Python integers and vice versa with:
@@ -11,7 +11,7 @@ Convert Church Numerals to Python integers and vice versa with:
     decode_num(church_numeral)
     make_num(n)
 
-Church numerals N0-N32 are defined for convenience.
+Church Numerals N0-N32 are defined for convenience.
 
 Similarly convert Church Booleans to Python booleans with:
 
