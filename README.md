@@ -25,6 +25,7 @@ in their proper decode function (apply functions to their arguments with '!'); e
     decodeNum (mul ! (suc ! n2) ! (add ! n2 ! n2))      -- == 12
     decodeBool (and ! (not ! not ! not ! false) ! true) -- == True
 
+The typical operators `and` `or` `not` `add` `sub` `mul` `div` `mod` `fac` are defined, plus many more found in the source code. 
 To use, enter the following into a terminal:
 
     ghci
@@ -56,6 +57,7 @@ in their proper decode function (apply functions to their arguments with parenth
     decode_num (MUL(SUC(N2))(ADD(N2)(N2)))        # == 12
     decode_bool (AND(NOT(NOT(NOT(FALSE))))(TRUE)) # == True
 
+The typical operators `AND` `OR` `NOT` `ADD` `SUB` `MUL` `DIV` `MOD` `FAC` are defined, plus many more found in the source code.
 To use, enter the following into a terminal:
 
     python3 -i lambda-calculus.py
